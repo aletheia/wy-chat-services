@@ -2,27 +2,45 @@
   "name": "way-chat",
   "version": "0.1.0",
   "bin": {
-    "way-chat": "bin/way-chat.js"
+    "way-chat": "stack/index.js"
   },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy": "cdk deploy",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.0",
-    "@types/node": "10.17.27",
-    "@types/prettier": "2.6.0",
-    "jest": "^27.5.1",
-    "ts-jest": "^27.1.4",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.25.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.25.0-alpha.0",
+    "@types/aws-lambda": "^8.10.97",
+    "@types/dotenv": "^8.2.0",
+    "@types/jest": "^27.5.1",
+    "@types/node": "^17.0.35",
+    "@types/prettier": "2.6.1",
     "aws-cdk": "2.25.0",
-    "ts-node": "^10.7.0",
-    "typescript": "~3.9.7"
+    "aws-lambda": "^1.0.7",
+    "esbuild": "^0.14.39",
+    "gts": "^3.1.0",
+    "jest": "^28.1.0",
+    "ts-jest": "^28.0.3",
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2"
   },
   "dependencies": {
+    "@types/nconf": "^0.10.2",
     "aws-cdk-lib": "2.25.0",
-    "constructs": "^10.0.0",
-    "source-map-support": "^0.5.21"
+    "constructs": "^10.1.17",
+    "dotenv": "^16.0.1",
+    "source-map-support": "^0.5.21",
+    "telegraf": "^4.8.2"
   }
 }
