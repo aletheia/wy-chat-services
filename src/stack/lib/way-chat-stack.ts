@@ -1,6 +1,5 @@
 import {Stack, StackProps, CfnOutput} from 'aws-cdk-lib';
 import {AttributeType, BillingMode, Table} from 'aws-cdk-lib/aws-dynamodb';
-import {Function} from 'aws-cdk-lib/aws-lambda';
 import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs';
 import {HttpApi} from '@aws-cdk/aws-apigatewayv2-alpha';
 import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha';

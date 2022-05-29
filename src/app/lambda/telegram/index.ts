@@ -1,48 +1,39 @@
 import {APIGatewayProxyHandlerV2} from 'aws-lambda';
-
-import {Telegraf} from 'telegraf';
-import {Update} from 'telegraf/typings/core/types/typegram';
 import {containerInstance} from '../../container';
-import {Config} from '../../lib/config';
 import {Logger} from '../../lib/logger';
+import {TelegramPort} from '../../ports/telegram';
 
-export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
+export const handler: APIGatewayProxyHandlerV2 = async event => {
   const container = containerInstance;
   const logger: Logger = container.resolve('logger');
-  const config: Config = container.resolve('config');
+  const port: TelegramPort = container.resolve('telegramPort');
 
-  logger.info(event);
+  try {
+    logger.info(event);
 
-  logger.info(`Telegram bot starting with token ${config.botToken}`);
-  const bot = new Telegraf(config.botToken, {
-    telegram: {webhookReply: true},
-  });
-  logger.info('Telegram bot started');
+    logger.info('Telegram bot handle update');
+    if (!event.body) {
+      logger.error('Telegram bot event body is empty');
+      return {
+        statusCode: 400,
+        body: 'Telegram bot event body is empty',
+      };
+    }
 
-  // bot.on('text', ({replyWithHTML}) => replyWithHTML('<b>Hello</b>'));
+    logger.info('Telegram bot handle update');
+    await port.handleTelegramPayload(event.body);
 
-  bot.on('text', ctx => {
-    logger.info(`Telegram bot received message: ${ctx.message.text}`);
-    return ctx.reply(`You said: ${ctx.message.text}`);
-  });
-
-  bot.launch({
-    webhook: {
-      domain: config.apiUrl,
-    },
-  });
-  logger.info('Telegram bot handle update');
-  if (!event.body) {
-    logger.error('Telegram bot event body is empty');
+    logger.info('Telegram bot handle update done');
     return {
-      statusCode: 400,
-      body: 'Telegram bot event body is empty',
+      statusCode: 200,
+      body: 'Telegram message handled',
+    };
+  } catch (e) {
+    logger.error(e);
+    const error: Error = e as Error;
+    return {
+      statusCode: 500,
+      body: error.message,
     };
   }
-  return bot.handleUpdate(JSON.parse(event.body) as Update);
-
-  // await bot.handleUpdate(event);
-  // return {
-  //   statusCode: 200,
-  // };
 };
