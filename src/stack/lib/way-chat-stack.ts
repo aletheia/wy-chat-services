@@ -28,7 +28,9 @@ export class WayChatStack extends Stack {
         entry: join(__dirname, '../../app/lambda/telegram/index.ts'),
         handler: 'handler',
         environment: {
-          BOT_TOKEN: config.botToken,
+          TELEGRAM_BOT_TOKEN: config.botToken,
+          SERVICE_NAME: config.serviceName,
+          TELEGRAM_WEBHOOK_URL: config.apiUrl,
         },
       }
     );
