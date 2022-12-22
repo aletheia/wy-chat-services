@@ -1,11 +1,11 @@
 import {inject, injectable} from 'tsyringe';
 import {Telegraf} from 'telegraf';
-import {Update} from 'telegraf/typings/core/types/typegram';
 import {Logic} from '../../logic';
-import {Logger} from '../../lib/logger';
-import {Config} from '../../lib/config';
+
 import {Channel, ChatMessage} from '../../core/chat_message';
 import {nanoid} from 'nanoid';
+import {Logger} from 'waylon-commons-lib';
+import {WayChatConfig} from '../../config';
 
 @injectable()
 export class TelegramPort {
@@ -13,7 +13,7 @@ export class TelegramPort {
   protected bot: Telegraf<any>;
   constructor(
     @inject('logger') protected logger: Logger,
-    @inject('config') protected config: Config,
+    @inject('config') protected config: WayChatConfig,
     @inject('logic') protected logic: Logic
   ) {
     this.logger = logger;
@@ -23,7 +23,8 @@ export class TelegramPort {
     logger.info(
       `[TelegramPort] - Telegram bot starting with token ${config.botToken}`
     );
-    this.bot = new Telegraf(config.botToken, {
+
+    this.bot = new Telegraf(this.config.telegramBotToken, {
       telegram: {webhookReply: true},
     });
     this.setupHandlers();

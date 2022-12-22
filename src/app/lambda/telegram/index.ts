@@ -1,10 +1,11 @@
 import {APIGatewayProxyHandlerV2} from 'aws-lambda';
-import {containerInstance} from '../../container';
-import {Logger} from '../../lib/logger';
+import {Logger} from 'waylon-commons-lib';
+import {setupContainer} from '../../container';
+
 import {TelegramPort} from '../../ports/telegram';
 
 export const handler: APIGatewayProxyHandlerV2 = async event => {
-  const container = containerInstance;
+  const container = await setupContainer();
   const logger: Logger = container.resolve('logger');
   const port: TelegramPort = container.resolve('telegramPort');
 

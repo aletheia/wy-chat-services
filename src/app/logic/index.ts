@@ -1,7 +1,7 @@
 import {inject, injectable} from 'tsyringe';
+import {Logger} from 'waylon-commons-lib';
 import {Adapters} from '../adapters';
 import {ChatMessage} from '../core/chat_message';
-import {Logger} from '../lib/logger';
 
 @injectable()
 export class Logic {

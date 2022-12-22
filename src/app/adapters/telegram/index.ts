@@ -1,8 +1,8 @@
 import {Telegraf} from 'telegraf';
 import {inject, injectable} from 'tsyringe';
+import {Logger} from 'waylon-commons-lib';
+import {WayChatConfig} from '../../config';
 import {ChatMessage} from '../../core/chat_message';
-import {Config} from '../../lib/config';
-import {Logger} from '../../lib/logger';
 
 @injectable()
 export class TelegramAdapter {
@@ -10,11 +10,11 @@ export class TelegramAdapter {
   private bot: Telegraf<any>;
   constructor(
     @inject('logger') protected logger: Logger,
-    @inject('config') protected config: Config
+    @inject('config') protected config: WayChatConfig
   ) {
     this.logger = logger;
     this.config = config;
-    this.bot = new Telegraf(config.botToken);
+    this.bot = new Telegraf(config.telegramBotToken);
   }
   sendMessage(message: ChatMessage) {
     this.logger.info(`[TelegramAdapter] - Sending message ${message.uuid}`);
