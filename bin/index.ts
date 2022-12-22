@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import {WayChatStack} from './lib/way-chat-stack';
+import {WayChatStack} from '../lib/way-chat-stack';
 
 const app = new cdk.App();
 new WayChatStack(app, 'WayChatStack', {

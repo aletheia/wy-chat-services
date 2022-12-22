@@ -1,12 +1,7 @@
 *.js
 !jest.config.js
-!.prettierrc.js
 *.d.ts
 node_modules
-build
-
-error.log
-log.log
 
 # CDK asset staging directory
 .cdk.staging
