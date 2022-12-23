@@ -1,67 +1,78 @@
-import {Stack, StackProps, CfnOutput, Stage} from 'aws-cdk-lib';
+import {CfnOutput, Stack, StackProps} from 'aws-cdk-lib';
+import {Cors, MethodLoggingLevel, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {AttributeType, BillingMode, Table} from 'aws-cdk-lib/aws-dynamodb';
-import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs';
-import {HttpApi, HttpMethod} from '@aws-cdk/aws-apigatewayv2-alpha';
-import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import {Construct} from 'constructs';
-import {join} from 'path';
-import {config} from 'dotenv';
-import {StringParameter} from 'aws-cdk-lib/aws-ssm';
-import {Effect, PolicyStatement} from 'aws-cdk-lib/aws-iam';
-import {LogLevel} from 'aws-cdk-lib/aws-stepfunctions';
+import {config as loadEnvVars} from 'dotenv';
+import {WCTelegramStack} from './way-chat-channel-telegram-stack';
+
+export interface StackConfig {
+	service: string;
+	stage: string;
+	logLevel: string;
+}
 
 const checkEnvVars = () => {
-  const {TELEGRAM_BOT_TOKEN, SERVICE_NAME, LOG_LEVEL} = process.env;
+	const {
+		SERVICE_NAME: serviceName,
+		LOG_LEVEL: logLevel,
+		STAGE: stage,
+	} = process.env;
 
-  if (!TELEGRAM_BOT_TOKEN || !SERVICE_NAME || !LOG_LEVEL) {
-    throw new Error(
-      'TELEGRAM_BOT_TOKEN, SERVICE_NAME and LOG_LEVEL must be set as environment variables'
-    );
-  }
+	if (!serviceName || !logLevel || !stage) {
+		throw new Error(
+			'SERVICE_NAME, LOG_LEVEL and STAGE must be set as environment variables',
+		);
+	}
+
+	return {
+		service: serviceName,
+		stage,
+		logLevel,
+	};
 };
 
 export class WayChatStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
-    super(scope, id, props);
+	constructor(scope: Construct, id: string, props?: StackProps) {
+		super(scope, id, props);
 
-    config();
-    const stage = Stage.of(this).stageName;
+		loadEnvVars();
+		const config: StackConfig = checkEnvVars();
 
-    const {
-      TELEGRAM_BOT_TOKEN: telegramBotToken,
-      SERVICE_NAME: serviceName,
-      LOG_LEVEL: logLevel,
-    } = process.env;
+		new Table(this, 'ChatTable', {
+			partitionKey: {
+				name: 'id',
+				type: AttributeType.STRING,
+			},
+			billingMode: BillingMode.PAY_PER_REQUEST,
+		});
 
-    if (!telegramBotToken || !serviceName || !logLevel) {
-      throw new Error(
-        'TELEGRAM_WEBHOOK_URL, TELEGRAM_BOT_TOKEN and SERVICE_NAME must be set as environment variables'
-      );
-    }
+		const api = new RestApi(this, 'WayChatApi', {
+			restApiName: `${config.service} API`,
+			description: 'API for the chat service',
+			deployOptions: {
+				stageName: config.stage,
+				loggingLevel: MethodLoggingLevel.INFO,
+				dataTraceEnabled: true,
+				metricsEnabled: true,
+			},
+			defaultCorsPreflightOptions: {
+				allowOrigins: Cors.ALL_ORIGINS,
+				allowMethods: Cors.ALL_METHODS,
+				allowHeaders: Cors.DEFAULT_HEADERS,
+			},
+			deploy: true,
+		});
 
-    const chatTable = new Table(this, 'ChatTable', {
-      partitionKey: {
-        name: 'id',
-        type: AttributeType.STRING,
-      },
-      billingMode: BillingMode.PAY_PER_REQUEST,
-    });
+		new WCTelegramStack(this, 'WayChatTelegramStack', {
+			api,
+			service: config.service,
+			stage: config.stage,
+			logLevel: config.logLevel,
+		});
 
-    const api = new HttpApi(this, 'WayChatApi');
-
-    const setupHooks = new NodejsFunction(this, 'SetupHook', {
-      entry: join(__dirname, '../../app/lambda/setup-hooks/index.ts'),
-      handler: 'handler',
-      environment: {
-        TELEGRAM_WEBHOOK_URL: telegramWebhookUrl,
-        TELEGRAM_BOT_TOKEN: telegramBotToken,
-        SERVICE_NAME: serviceName,
-        LOG_LEVEL: logLevel,
-      },
-    });
-
-    new CfnOutput(this, 'ApiUrl', {
-      value: api.url || '',
-    });
-  }
+		new CfnOutput(this, 'ApiUrl', {
+			value: api.url,
+			description: 'The URL of the API',
+		});
+	}
 }
