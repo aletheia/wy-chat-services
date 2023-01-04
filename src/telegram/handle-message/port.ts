@@ -1,6 +1,6 @@
 import {inject, injectable} from 'tsyringe';
 import {Telegraf} from 'telegraf';
-import {Logic} from '../../logic';
+import {Logic} from './logic';
 
 import {Channel, ChatMessage} from '../../core/chat_message';
 import {nanoid} from 'nanoid';

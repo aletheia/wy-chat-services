@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {Logger} from 'waylon-commons-lib';
 import {WayChatConfig} from '../../config';
-import {setupContainer} from '../../container';
+import {setupContainer} from '../handle-message/container';
 
 export const handler = async () => {
 	const container = await setupContainer();
