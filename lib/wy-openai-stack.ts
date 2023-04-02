@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Cors, Deployment, EndpointType, LambdaIntegration, RestApi, Stage } from 'aws-cdk-lib/aws-apigateway';
+import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Construct } from 'constructs';
 import { join } from 'path';
@@ -9,10 +10,14 @@ export interface WyOpenAIStackProps extends cdk.StackProps {
 }
 
 export class WyOpenAIStack extends cdk.Stack {
+    public apiUrl: string;
+
     constructor(scope: Construct, id: string, props: WyOpenAIStackProps) {
         super(scope, id, props);
 
         const openaiFunction = new NodejsFunction(this, 'OpenAIInterface', {
+            functionName: 'waylon-openai-bridge',
+            runtime: Runtime.NODEJS_18_X,
             entry: join(__dirname, '../lambda/openai/index.ts'),
             timeout: cdk.Duration.seconds(30),
             environment: {
@@ -44,5 +49,7 @@ export class WyOpenAIStack extends cdk.Stack {
         });
 
         openaiApi.deploymentStage = stage;
+
+        this.apiUrl = `${openaiApi.url}`;
     }
 }
