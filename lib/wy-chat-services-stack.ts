@@ -1,16 +1,20 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { WyOpenAIStack } from './wy-openai-stack';
+
+import { config as loadEnvVars } from 'dotenv';
 
 export class WyChatServicesStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        // The code that defines your stack goes here
+        loadEnvVars();
 
-        // example resource
-        // const queue = new sqs.Queue(this, 'WyChatServicesQueue', {
-        //   visibilityTimeout: cdk.Duration.seconds(300)
-        // });
+        const openaiKey = process.env.OPENAI_API_KEY;
+        if (!openaiKey) {
+            throw new Error('OPENAI_API_KEY environment variable not set');
+        }
+
+        new WyOpenAIStack(this, 'WyOpenaiStack', { openaiKey });
     }
 }
