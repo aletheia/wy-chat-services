@@ -1,34 +1,45 @@
 {
-  "name": "wy-chat-services",
-  "version": "0.1.0",
-  "bin": {
-    "wy-chat-services": "bin/wy-chat-services.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "test": "jest",
-    "cdk": "cdk"
-  },
-  "devDependencies": {
-    "@types/jest": "^29.4.0",
-    "@types/node": "18.14.6",
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "aws-cdk": "2.72.1",
-    "eslint": "^8.37.0",
-    "eslint-config-standard-with-typescript": "^34.0.1",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.7.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "jest": "^29.5.0",
-    "prettier": "^2.8.7",
-    "ts-jest": "^29.0.5",
-    "ts-node": "^10.9.1",
-    "typescript": "~4.9.5"
-  },
-  "dependencies": {
-    "aws-cdk-lib": "2.72.1",
-    "constructs": "^10.0.0",
-    "source-map-support": "^0.5.21"
-  }
+    "name": "wy-chat-services",
+    "version": "0.1.0",
+    "bin": {
+        "wy-chat-services": "bin/wy-chat-services.js"
+    },
+    "scripts": {
+        "bootstrap": "cdk bootstrap",
+        "build": "tsc",
+        "lint": "eslint --ext .ts,.tsx,.js,.jsx .",
+        "lint:fix": "eslint --ext .ts,.tsx,.js,.jsx . --fix",
+        "format": "prettier --write .",
+        "coverage": "jest --coverage",
+        "watch": "tsc -w",
+        "test": "jest",
+        "cdk": "cdk"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.114",
+        "@types/dotenv": "^8.2.0",
+        "@types/jest": "^29.4.0",
+        "@types/node": "18.14.6",
+        "@typescript-eslint/eslint-plugin": "^5.57.0",
+        "aws-cdk": "2.72.1",
+        "dotenv": "^16.0.3",
+        "esbuild": "^0.17.15",
+        "eslint": "^8.37.0",
+        "eslint-config-prettier": "^8.8.0",
+        "eslint-config-standard-with-typescript": "^34.0.1",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-n": "^15.7.0",
+        "eslint-plugin-promise": "^6.1.1",
+        "jest": "^29.5.0",
+        "prettier": "^2.8.7",
+        "ts-jest": "^29.0.5",
+        "ts-node": "^10.9.1",
+        "typescript": "~4.9.5"
+    },
+    "dependencies": {
+        "aws-cdk-lib": "2.72.1",
+        "constructs": "^10.0.0",
+        "openai": "^3.2.1",
+        "source-map-support": "^0.5.21"
+    }
 }
