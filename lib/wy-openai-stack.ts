@@ -21,7 +21,7 @@ export class WyOpenAIStack extends cdk.Stack {
             entry: join(__dirname, '../lambda/openai/index.ts'),
             timeout: cdk.Duration.seconds(30),
             environment: {
-                OPENAI_API_KEY: props.openaiKey,
+                // OPENAI_API_KEY: props.openaiKey,
             },
         });
 
@@ -29,7 +29,10 @@ export class WyOpenAIStack extends cdk.Stack {
             restApiName: 'waylon-openai-api',
             description: 'API to interface with OpenAI',
             endpointTypes: [EndpointType.REGIONAL],
-            deploy: false,
+            deploy: true,
+            deployOptions: {
+                stageName: 'v1',
+            },
             defaultCorsPreflightOptions: {
                 allowOrigins: Cors.ALL_ORIGINS,
                 allowMethods: Cors.ALL_METHODS,
@@ -37,18 +40,19 @@ export class WyOpenAIStack extends cdk.Stack {
             },
         });
 
-        openaiApi.root.addMethod('POST', new LambdaIntegration(openaiFunction));
+        const chatApi = openaiApi.root.addResource('chat');
+        chatApi.addMethod('POST', new LambdaIntegration(openaiFunction));
 
-        const deployment = new Deployment(this, 'WyOpenAIDeployment', {
-            api: openaiApi,
-        });
+        // const deployment = new Deployment(this, 'WyOpenAIDeployment', {
+        //     api: openaiApi,
+        // });
 
-        const stage = new Stage(this, 'WyOpenAIStageV1', {
-            deployment,
-            stageName: 'v1',
-        });
+        // const stage = new Stage(this, 'WyOpenAIStageV1', {
+        //     deployment,
+        //     stageName: 'v1',
+        // });
 
-        openaiApi.deploymentStage = stage;
+        // openaiApi.deploymentStage = stage;
 
         this.apiUrl = `${openaiApi.url}`;
     }
